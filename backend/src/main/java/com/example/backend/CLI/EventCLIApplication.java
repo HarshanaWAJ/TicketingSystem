@@ -5,6 +5,7 @@ import com.example.backend.Services.EventService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Scanner;
@@ -15,41 +16,27 @@ public class EventCLIApplication {
     @Autowired
     private EventService eventService;
 
+    private static final Scanner scanner = new Scanner(System.in);
+
     public void run() {
-        Scanner scanner = new Scanner(System.in);
-
+        // Collect event name
         System.out.println("Enter event name:");
-        String eventName = scanner.nextLine();
+        String eventName = getValidInput("Event name");
 
+        // Collect event venue
         System.out.println("Enter event venue:");
-        String eventVenue = scanner.nextLine();
+        String eventVenue = getValidInput("Event venue");
 
-        System.out.println("Enter event date (yyyy-MM-dd):");
-        String eventDateInput = scanner.nextLine();
+        // Collect and validate event date
+        Date eventDate = getValidDate("Enter event date (yyyy-MM-dd):");
 
-        System.out.println("Enter event start time (HH:mm):");
-        String startTime = scanner.nextLine();
+        // Collect and validate event start time
+        String startTime = getValidTime("Enter event start time (HH:mm):");
 
-        System.out.println("Enter event end time (HH:mm):");
-        String endTime = scanner.nextLine();
+        // Collect and validate event end time
+        String endTime = getValidTime("Enter event end time (HH:mm):");
 
-        // Parse eventDate from String to Date
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        Date eventDate = null;
-        try {
-            eventDate = dateFormat.parse(eventDateInput);
-        } catch (Exception e) {
-            System.out.println("Invalid date format. Please use yyyy-MM-dd.");
-            return; // Exit the method if the date is invalid
-        }
-
-        // Check if the date was parsed successfully
-        if (eventDate == null) {
-            System.out.println("Error parsing the date.");
-            return;
-        }
-
-        // Create a new EventEntity object
+        // Create event entity
         EventEntity event = new EventEntity();
         event.setEventName(eventName);
         event.setEventVenue(eventVenue);
@@ -64,5 +51,54 @@ public class EventCLIApplication {
         } else {
             System.out.println("Error saving the event.");
         }
+    }
+
+    // Method to handle user input for a valid string
+    private String getValidInput(String prompt) {
+        String input;
+        while (true) {
+            System.out.println(prompt + ":");
+            input = scanner.nextLine().trim();
+            if (!input.isEmpty()) {
+                break; // Valid input
+            } else {
+                System.out.println("Invalid input. Please enter a valid " + prompt + ".");
+            }
+        }
+        return input;
+    }
+
+    // Method to get and validate a date input
+    private Date getValidDate(String prompt) {
+        Date date = null;
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        while (date == null) {
+            System.out.println(prompt);
+            String dateInput = scanner.nextLine().trim();
+            try {
+                date = dateFormat.parse(dateInput);
+            } catch (ParseException e) {
+                System.out.println("Invalid date format. Please use yyyy-MM-dd.");
+            }
+        }
+        return date;
+    }
+
+    // Method to handle user input for a valid time in HH:mm format
+    public String getValidTime(String prompt) {
+        String time = null;
+        while (time == null) {
+            System.out.println(prompt);
+            String timeInput = scanner.nextLine().trim();
+            System.out.println("Input: '" + timeInput + "'"); // Debugging line
+
+            // Check if time matches HH:mm format
+            if (timeInput.matches("([01]\\d|2[0-3]):([0-5]\\d)")) {
+                time = timeInput;
+            } else {
+                System.out.println("Invalid time format. Please use HH:mm (24-hour format).");
+            }
+        }
+        return time;
     }
 }
