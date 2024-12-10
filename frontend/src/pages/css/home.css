@@ -1,0 +1,25 @@
+.hero {
+    position: relative; /* Required for pseudo-element positioning */
+    color: black;
+    padding: 100px 0;
+    text-align: center;
+  }
+  
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('../../images/bg.jpg') no-repeat center center;
+    background-size: cover;
+    opacity: 0.5; /* Adjust opacity of the background image */
+    z-index: -1; /* Ensures that the image stays behind the text and other content */
+  }
+  
+  .card-img-top {
+    object-fit: cover;
+    height: 200px; /* Ensure that the images are sized appropriately */
+  }
+  
